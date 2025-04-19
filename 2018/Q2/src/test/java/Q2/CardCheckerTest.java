@@ -11,6 +11,12 @@ import static org.junit.Assert.assertEquals;
 public class CardCheckerTest {
   // implement your tests here
 
+
+    /**
+     * The`mock(Class<T> type)` overload generates a name for the mock object internally based on the type.
+     * Hence, having two identically typed mock objects will result in an IllegalArgument Exception
+     *  unless we add our own names explicitly.
+     */
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
     Observer obs1 = context.mock(Observer.class, "obs1");
