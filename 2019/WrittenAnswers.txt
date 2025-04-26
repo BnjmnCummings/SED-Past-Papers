@@ -1,0 +1,15 @@
+Question 1:
+a.iii: If either the BillingSystem or LocalTime classes are changed/deprecated,
+    our PhoneCall class could need changes or become redundant.
+
+Question 2:
+a.i: - One benefit of using MVC is modularity. We've seperated the code maintaining the program's data (model) from the
+    code governing the GUI display (view). This makes our application easier to test and maintain as functionality is
+    clearly compartmentalised. (This also makes the Model class more mobile).
+
+a.ii: - Another benefit is Scalability. We can easily change the Model to use an observer pattern, registering many views
+    as observers. This allows us to have many different displays and decouples Model from View (if we have view
+    implement an updatable/observer interface).
+
+a.iii - An alternative to MVC is PAC (Presentation Abstraction-Control).
+
