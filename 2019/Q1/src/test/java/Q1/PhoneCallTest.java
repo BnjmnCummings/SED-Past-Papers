@@ -93,7 +93,12 @@ public class PhoneCallTest {
     call.charge();
   }
 
-  private class TestClock implements Clock {
+  /**
+   * our class should be an idiomatic 'inner class' meaning. It doesn't need to access members/methods of the
+   * enclosing class [[PhoneCallTest]] so it should be marked as static.
+   */
+  private static class TestClock implements Clock {
+
     private LocalTime time;
 
     public TestClock() {
