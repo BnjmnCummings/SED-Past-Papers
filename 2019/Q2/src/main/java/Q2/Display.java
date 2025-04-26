@@ -1,13 +1,16 @@
 package Q2;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 
 public class Display implements Updatable {
     private final JTextField currentMax = new JTextField(11);
     private final JTextField currentMean = new JTextField(11);
+    private final Controller controller;
 
-    public Display(ActionListener[] listeners) {
+    public Display() {
+        SimpleStatsModel model = new SimpleStatsModel(this);
+        this.controller = new Controller(model);
+
         JFrame frame = new JFrame("Simple Stats");
         frame.setSize(250, 350);
 
@@ -16,17 +19,17 @@ public class Display implements Updatable {
         panel.add(currentMax);
         panel.add(new JLabel("Mean: value "));
         panel.add(currentMean);
-        initialiseButtons(panel, listeners);
+        initialiseButtons(panel);
 
         frame.getContentPane().add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 
-    private void initialiseButtons(JPanel panel, ActionListener[] listeners) {
-        for (int i = 0; i < 12; i++) {
-            JButton button = new JButton(String.valueOf(i + 1));
-            button.addActionListener(listeners[i]);
+    private void initialiseButtons(JPanel panel) {
+        for (int i = 1; i <= 12; i++) {
+            JButton button = new JButton(String.valueOf(i));
+            button.addActionListener(controller.addNumberButton(i));
             panel.add(button);
         }
     }
@@ -45,5 +48,9 @@ public class Display implements Updatable {
   public void update(SimpleStatsModel model) {
         currentMax.setText(String.valueOf(model.getMax()));
         currentMean.setText(String.valueOf(model.getMean()));
+  }
+
+  public static void main(String[] args) {
+      new Display();
   }
 }
