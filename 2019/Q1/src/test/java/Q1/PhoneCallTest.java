@@ -1,28 +1,26 @@
 package Q1;
 
+import org.jmock.Expectations;
+import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Rule;
 import org.junit.Test;
 import java.time.LocalTime;
 
-import static org.junit.Assert.assertEquals;
-
 public class PhoneCallTest {
 
-  PhoneCall call = new PhoneCall("+447770123456", "+4479341554433");
+  private final String CALLER = "+447770123456";
+  private final String CALLEE = "+4479341554433";
 
-  /*
-    @Test
-    public void exampleOfHowToUsePhoneCall() throws Exception {
-      PhoneCall call = new PhoneCall("+447770123456", "+4479341554433");
-      call.start();
-      waitForSeconds(150);
-      call.end();
-      call.charge();
-    }
-
-    private void waitForSeconds(int n) throws Exception {
-      Thread.sleep(n * 1000);
-    }
-  */
+  @Rule
+  public JUnitRuleMockery context = new JUnitRuleMockery();
+  ChargingSystem chargingSystem = context.mock(ChargingSystem.class);
+  TestClock testClock = new TestClock();
+  PhoneCall call = new PhoneCall(
+          CALLER,
+          CALLEE,
+          testClock,
+          chargingSystem
+  );
 
   /**
    * "Show that peak time calls are charged correctly."
@@ -31,17 +29,16 @@ public class PhoneCallTest {
    */
   @Test
   public void peakTimeCallsAreChargedCorrectly() throws Exception {
-    PhoneCall call = new PhoneCall("+447770123456", "+4479341554433");
+    context.checking(new Expectations() {{
+      exactly(1).of(chargingSystem).addBillItem(CALLER, CALLEE, 60 * 25);
+    }});
+    testClock.setTime(LocalTime.of(10, 00));
+    call.start();
+    testClock.setTime(LocalTime.of(10, 59));
+    call.end();
 
-    call.setStartTime(LocalTime.of(10, 00));
-    call.setEndTime(LocalTime.of(10, 59));
+    call.charge();
 
-    /* now, we don't want to interact with the billing system in this unit test.
-      Furthermore, BillingSystem is a singleton class and so passing mock BillingSystem into the PhoneCall
-      constructor doesn't really make sense.
-
-      Instead, we'll use put a seam around the billing call. */
-    assertEquals(call.generateBill(), 60 * 25);
   }
 
   /**
@@ -50,12 +47,16 @@ public class PhoneCallTest {
    */
   @Test
   public void offPeakTimeCallsAreChargedCorrectly() throws Exception {
-    PhoneCall call = new PhoneCall("+447770123456", "+4479341554433");
+    context.checking(new Expectations() {{
+      exactly(1).of(chargingSystem).addBillItem(CALLER, CALLEE, 60 * 10);
+    }});
 
-    call.setStartTime(LocalTime.of(8, 0));
-    call.setEndTime(LocalTime.of(8, 59));
+    testClock.setTime(LocalTime.of(8, 0));
+    call.start();
+    testClock.setTime(LocalTime.of(8, 59));
+    call.end();
 
-    assertEquals(call.generateBill(), 60 * 10);
+    call.charge();
   }
 
   /**
@@ -66,22 +67,47 @@ public class PhoneCallTest {
    */
   @Test
   public void callsStartingInPeakTimeAreChargedPeakPrice() throws Exception {
-    PhoneCall call = new PhoneCall("+447770123456", "+4479341554433");
+    context.checking(new Expectations() {{
+      exactly(1).of(chargingSystem).addBillItem(CALLER, CALLEE, (60 * 9 + 1)  * 25);
+    }});
 
-    call.setStartTime(LocalTime.of(10, 00));
-    call.setEndTime(LocalTime.of(19, 00));
+    testClock.setTime(LocalTime.of(10, 00));
+    call.start();
+    testClock.setTime(LocalTime.of(19, 00));
+    call.end();
 
-    assertEquals(call.generateBill(), (60 * 9 + 1)  * 25);
+    call.charge();
   }
 
   @Test
   public void callsEndingInPeakTimeAreChargedPeakPrice() throws Exception {
-    PhoneCall call = new PhoneCall("+447770123456", "+4479341554433");
+    context.checking(new Expectations() {{
+      exactly(1).of(chargingSystem).addBillItem(CALLER, CALLEE, (60 * 9 + 1)  * 25);
+    }});
 
-    call.setStartTime(LocalTime.of(8, 00));
-    call.setEndTime(LocalTime.of(17, 00));
+    testClock.setTime(LocalTime.of(8, 00));
+    call.start();
+    testClock.setTime(LocalTime.of(17, 00));
+    call.end();
 
-    assertEquals(call.generateBill(), (60 * 9 + 1)  * 25);
+    call.charge();
+  }
+
+  private class TestClock implements Clock {
+    private LocalTime time;
+
+    public TestClock() {
+      time = LocalTime.now();
+    }
+
+    public void setTime(LocalTime time) {
+      this.time = time;
+    }
+
+    @Override
+    public LocalTime now() {
+      return time;
+    }
   }
 
 }

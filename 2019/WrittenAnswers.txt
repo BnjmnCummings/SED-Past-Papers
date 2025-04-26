@@ -1,4 +1,6 @@
 Question 1:
+a.i: The First source of coupling is the use of LocalTime
+a.ii: The second source of Coupling is the BillingSystem class.
 a.iii: If either the BillingSystem or LocalTime classes are changed/deprecated,
     our PhoneCall class could need changes or become redundant.
 

@@ -1,6 +1,6 @@
 package Q1;
 
-public class BillingSystem {
+public class BillingSystem implements ChargingSystem{
 
   private static final BillingSystem INSTANCE = new BillingSystem();
 

@@ -7,10 +7,8 @@ public class Display implements Updatable {
     private final JTextField currentMean = new JTextField(11);
     private final Controller controller;
 
-    public Display() {
-        SimpleStatsModel model = new SimpleStatsModel(this);
+    public Display(SimpleStatsModel model) {
         this.controller = new Controller(model);
-
         JFrame frame = new JFrame("Simple Stats");
         frame.setSize(250, 350);
 
@@ -51,6 +49,8 @@ public class Display implements Updatable {
   }
 
   public static void main(String[] args) {
-      new Display();
+      SimpleStatsModel model = new SimpleStatsModel();
+      Display display = new Display(model);
+      model.addObserver(display);
   }
 }

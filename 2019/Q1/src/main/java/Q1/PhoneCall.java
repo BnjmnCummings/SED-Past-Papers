@@ -11,6 +11,8 @@ public class PhoneCall {
 
   private final String caller;
   private final String callee;
+  private final Clock clock;
+  private final ChargingSystem billingSystem;
 
   /**
    * The first source of Coupling is here.
@@ -20,41 +22,28 @@ public class PhoneCall {
   private LocalTime startTime;
   private LocalTime endTime;
 
-  public PhoneCall(String caller, String callee) {
+  public PhoneCall(String caller, String callee, Clock clock, ChargingSystem billingSystem) {
     this.caller = caller;
     this.callee = callee;
+    this.clock = clock;
+    this.billingSystem = billingSystem;
   }
 
   public void start() {
-    setStartTime(LocalTime.now());
+    this.startTime = clock.now();
   }
 
   public void end() {
-    setEndTime(LocalTime.now());
+    this.endTime = clock.now();
   }
 
-  public void setStartTime(LocalTime startTime) {
-    this.startTime = startTime;
-  }
-
-  public void setEndTime(LocalTime endTime) {
-    this.endTime = endTime;
-  }
-
-  /**
-   * The second source of Coupling is here.
-   * We are dependent on the BillingSystem class.
-   */
   public void charge() {
-    generateBill();
+    billingSystem.addBillItem(caller, callee, priceInPence());
   }
 
-  public long generateBill() {
-    final long price = priceInPence();
-    BillingSystem.getInstance().addBillItem(caller, callee, price);
-    return price;
+  public long getPriceInPence() {
+    return priceInPence();
   }
-
 
   private long priceInPence() {
     if (duringPeakTime(startTime) || duringPeakTime(endTime)) {
