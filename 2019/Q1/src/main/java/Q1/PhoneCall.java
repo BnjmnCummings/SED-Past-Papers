@@ -41,10 +41,6 @@ public class PhoneCall {
     billingSystem.addBillItem(caller, callee, priceInPence());
   }
 
-  public long getPriceInPence() {
-    return priceInPence();
-  }
-
   private long priceInPence() {
     if (duringPeakTime(startTime) || duringPeakTime(endTime)) {
       return duration() * PEAK_RATE;
