@@ -1,0 +1,7 @@
+Q1.b:
+ i.   - A command if a method call that tells an object to do something (delegates all of the work to that class),
+    whereas a query will ask something of the object (requesting information).
+ ii.  - getNumberOfPendingOrders() is a query, order() is a command.
+ iii. - designing code based on commands makes collaborating objects less dependant on each other. The client calls the method
+    order() and expects everything to be fully dealt with by the OrderProcessor.
+ iv.  - "Tell, don't ask"
