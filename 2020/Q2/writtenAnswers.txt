@@ -1,0 +1,9 @@
+Q2.a: - StockMarketDataFeed uses a singleton design pattern. This is queried in line 25 of AlgoTrader inside trade().
+    It's hard to unit test AlgoTrader as it draws all of its pricing information from this singleton class making it
+    non-deterministic.
+
+   b.i:  - we can use an adapter pattern to isolate the two packages.
+    .ii: - This relates to the Hexagonal Architectural Style.
+
+   c. - for dependency inversion we probably want to make AlgoTrader independent from SimpleBroker. We can do this by abstracting
+    SimpleBroker out to an interface.

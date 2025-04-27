@@ -1,6 +1,6 @@
 package ic.doc;
 
-public class SimpleBroker {
+public class SimpleBroker implements Broker{
 
   // imagine that this class is fully implemented so that it really places trades.
   // For the purposes of the exam we have left it as a skeleton.

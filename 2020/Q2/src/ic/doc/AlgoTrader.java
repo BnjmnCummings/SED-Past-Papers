@@ -1,8 +1,8 @@
 package ic.doc;
 
-import com.londonstockexchange.StockMarketDataFeed;
-import com.londonstockexchange.StockPrice;
 import com.londonstockexchange.TickerSymbol;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,50 +11,58 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class AlgoTrader {
+  private final Map<String, Integer> lastPrices = new HashMap<>();
+  private final MarketDataService market;
+  private final Broker broker;
+  private final List<String> stocksToWatch;
 
-  private final List<TickerSymbol> stocksToWatch =
-      List.of(TickerSymbol.GOOG, TickerSymbol.MSFT, TickerSymbol.APPL);
-
-  private final Map<TickerSymbol, Integer> lastPrices = new HashMap<>();
-  private final SimpleBroker broker = new SimpleBroker();
+  /**
+   * Passing concrete classes into the constructor is a nice way to do dependency inversion.
+   * The VarArgs stocksToWatch probably isn't necessary.
+   */
+  public AlgoTrader(MarketDataService market, Broker broker, String... stocksToWatch) {
+    this.market = market;
+    this.broker = broker;
+    this.stocksToWatch = List.of(stocksToWatch);
+  }
 
   public void trade() {
 
-    for (TickerSymbol stock : stocksToWatch) {
+    for (String stock : stocksToWatch) {
 
-      StockPrice price = StockMarketDataFeed.getInstance().currentPriceFor(stock);
+      int price = market.currentPriceFor(stock);
 
       if (isRising(stock, price)) {
-        broker.buy(String.valueOf(stock));
+        broker.buy(stock);
       }
 
       if (isFalling(stock, price)) {
-        broker.sell(String.valueOf(stock));
+        broker.sell(stock);
       }
 
-      lastPrices.put(stock, price.inPennies());
+      lastPrices.put(stock, price);
     }
   }
 
-  private boolean isFalling(TickerSymbol stock, StockPrice price) {
+  private boolean isFalling(String stock, int price) {
     int lastPrice = lastPrices.containsKey(stock) ? lastPrices.get(stock) : 0;
-    return price.inPennies() < lastPrice;
+    return price < lastPrice;
   }
 
-  private boolean isRising(TickerSymbol stock, StockPrice price) {
+  private boolean isRising(String stock, int price) {
     int lastPrice = lastPrices.containsKey(stock) ? lastPrices.get(stock) : Integer.MAX_VALUE;
-    return price.inPennies() > lastPrice;
+    return price > lastPrice;
   }
 
   public static void main(String[] args) {
-    new AlgoTrader().start();
+    new AlgoTrader(new MarketDataAdapter(), new SimpleBroker(), "GOOG", "AMZN", "APPL").start();
   }
 
   // code below here is not important for the exam
 
-  private void logPrices(TickerSymbol stock, StockPrice price, int lastPrice) {
+  private void logPrices(TickerSymbol stock, int price, int lastPrice) {
     System.out.println(
-        String.format("%s used to be %s, now %s ", stock, lastPrice, price.inPennies()));
+        String.format("%s used to be %s, now %s ", stock, lastPrice, price));
   }
 
   private void start() {
