@@ -2,7 +2,7 @@ package retail;
 
 import java.math.BigDecimal;
 
-public class CreditCardProcessor {
+public class CreditCardProcessor implements PaymentProcessor{
 
   private static final CreditCardProcessor INSTANCE = new CreditCardProcessor();
 
@@ -12,6 +12,7 @@ public class CreditCardProcessor {
     return INSTANCE;
   }
 
+  @Override
   public void charge(BigDecimal amount, CreditCardDetails account, Address billingAddress) {
 
     System.out.println("Credit card charged: " + account + " amount: " + amount);

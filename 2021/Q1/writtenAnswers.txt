@@ -1,0 +1,5 @@
+Q1.c:
+    i.  - Singleton. You can easily tell this by noticing references to "instance" everywhere.
+    ii. - It's hard to test singleton classes and their collaborators. Since there's only one instance, which is
+    accessible to many different objects, we can get non-deterministic behaviour ie. two collaborators can change the
+    instance's data so we can't be sure what state it's in at any given time.

@@ -1,17 +1,9 @@
 package retail;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Collections;
 import java.util.List;
 
-public class BulkOrder {
-
-  private final List<Product> items;
-  private final CreditCardDetails creditCardDetails;
-  private final Address billingAddress;
-  private final Address shippingAddress;
-  private final Courier courier;
+public class BulkOrder extends Order{
   private final BigDecimal discount;
 
   public BulkOrder(
@@ -20,16 +12,14 @@ public class BulkOrder {
       Address billingAddress,
       Address shippingAddress,
       Courier courier,
-      BigDecimal discount) {
-    this.items = Collections.unmodifiableList(items);
-    this.creditCardDetails = creditCardDetails;
-    this.billingAddress = billingAddress;
-    this.shippingAddress = shippingAddress;
-    this.courier = courier;
+      BigDecimal discount
+      ) {
+    super(items, creditCardDetails, billingAddress, shippingAddress, courier);
     this.discount = discount;
   }
 
-  public void process() {
+  @Override
+  public void process(PaymentProcessor paymentProcessor) {
 
     BigDecimal total = new BigDecimal(0);
 
@@ -45,12 +35,8 @@ public class BulkOrder {
 
     total = total.subtract(discount);
 
-    CreditCardProcessor.getInstance().charge(round(total), creditCardDetails, billingAddress);
+    paymentProcessor.charge(round(total), creditCardDetails, billingAddress);
 
     courier.send(new Parcel(items), shippingAddress);
-  }
-
-  private BigDecimal round(BigDecimal amount) {
-    return amount.setScale(2, RoundingMode.CEILING);
   }
 }
